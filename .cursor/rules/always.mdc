@@ -1,6 +1,7 @@
 ---
 alwaysApply: true
 ---
+
 # Python 개발 원칙 (범용)
 
 ## 가치
@@ -20,11 +21,13 @@ alwaysApply: true
 **원칙**: 모든 함수와 메서드는 입력 파라미터와 반환 타입을 명시적으로 선언해야 한다.
 
 **적용**:
+
 - Python 3.12+ 타입 힌트 사용 (`str | None` 대신 `Optional[str]` 사용)
 - 변수에도 타입 힌트 추가
 - 복잡한 반환 타입은 DTO나 TypedDict 사용
 
 **금지 패턴**:
+
 ```python
 # BAD
 def process_data(data):
@@ -42,11 +45,13 @@ def process_data(data: dict[str, Any]) -> str | None:
 **원칙**: 런타임에 속성을 동적으로 접근하는 코드를 금지한다.
 
 **적용**:
+
 - `getattr()`, `setattr()`, `hasattr()` 사용 금지
 - 정적 속성 접근만 사용
 - 타입 안정성 확보
 
 **금지 패턴**:
+
 ```python
 # BAD
 value = getattr(obj, 'field', None)
@@ -64,11 +69,13 @@ value = obj.field if hasattr(obj, 'field') else None
 **원칙**: 타입 체크 대신 정확한 타입을 받아서 예측 가능하게 만든다.
 
 **적용**:
+
 - 함수 시그니처에서 정확한 타입 명시
 - 다형성이 필요한 경우 Protocol이나 ABC 사용
 - 타입 가드를 통한 안전한 타입 체크
 
 **금지 패턴**:
+
 ```python
 # BAD
 def process(obj):
@@ -92,11 +99,13 @@ def process_int(number: int) -> str:
 **원칙**: 모든 import 문은 파일 상단에 명시적으로 선언해야 한다.
 
 **적용**:
+
 - 함수/메서드 내부에서 import 금지
 - 조건부 import 금지
 - 의존성 명확화
 
 **금지 패턴**:
+
 ```python
 # BAD
 def process():
@@ -117,11 +126,13 @@ def process() -> Class:
 **원칙**: 실제 성능 문제가 드러나기 전까지는 최적화를 하지 않는다.
 
 **적용**:
+
 - 명확성 우선, 성능은 두 번째
 - 프로파일링 기반 최적화
 - 불필요한 인덱스나 캐시 추가 금지
 
 **금지 패턴**:
+
 ```python
 # BAD: 성능 문제 없는데 미리 최적화
 @lru_cache(maxsize=1000)
@@ -140,11 +151,13 @@ def simple_calculation(x: int) -> int:
 **원칙**: 현실적으로 발생하지 않을 상황을 대비한 과도한 방어 코드를 작성하지 않는다.
 
 **적용**:
+
 - 현실적인 시나리오에 집중
 - 타입 힌트로 많은 검증을 대체
 - 코드 간결성 유지
 
 **금지 패턴**:
+
 ```python
 # BAD: 과도한 방어
 def process_data(data):
@@ -172,11 +185,13 @@ def process_data(data: dict[str, str]) -> str | None:
 **원칙**: 함수는 최대 25줄을 넘지 않으며, 15줄 이하를 권장한다.
 
 **적용**:
+
 - 복잡한 로직은 작은 함수로 분리
 - 단일 책임 원칙 준수
 - 가독성 향상
 
 **적용 예시**:
+
 ```python
 # BAD: 긴 함수
 def process_order(order_id, payment_data):
@@ -200,6 +215,7 @@ def _load_and_validate_order(order_id: int) -> Order:
 **원칙**: 예제 파일은 80줄을 넘지 않도록 한다.
 
 **적용**:
+
 - 큰 파일은 모듈로 분리
 - 관련 기능끼리 그룹화
 - 유지보수성 향상
@@ -211,11 +227,13 @@ def _load_and_validate_order(order_id: int) -> Order:
 **원칙**: 함수와 클래스 이름은 그 목적을 즉시 드러내야 한다.
 
 **적용**:
+
 - 동사로 시작하는 함수명 (create, update, delete 등)
 - 명사로 시작하는 클래스명
 - 축약어 사용 최소화
 
 **금지 패턴**:
+
 ```python
 # BAD
 def proc(d): pass
@@ -233,11 +251,13 @@ class DataManager: pass
 **원칙**: 적절한 책임 분리를 통해 레이어를 구분한다.
 
 **적용**:
+
 - 각 레이어는 명확한 책임을 가짐
 - 상위 레이어는 하위 레이어에 의존
 - 순환 의존성 방지
 
 **레이어 예시**:
+
 - **Controller/View**: HTTP 요청/응답 처리
 - **Service**: 비즈니스 로직 오케스트레이션
 - **Repository**: 데이터 접근 추상화
@@ -250,11 +270,13 @@ class DataManager: pass
 **원칙**: 각 클래스와 함수는 하나의 명확한 책임만 가져야 한다.
 
 **적용**:
+
 - 하나의 변경 이유만 존재
 - 작고 집중된 모듈
 - 테스트 용이성 향상
 
 **적용 예시**:
+
 ```python
 # BAD: 여러 책임
 class UserManager:
@@ -280,11 +302,13 @@ class PasswordValidator:
 **원칙**: 함수의 입력과 출력을 명시적으로 정의하고 문서화한다.
 
 **적용**:
+
 - 타입 힌트로 입출력 명시
 - 복잡한 구조는 DTO 사용
 - docstring으로 추가 설명
 
 **적용 예시**:
+
 ```python
 from dataclasses import dataclass
 
@@ -314,11 +338,13 @@ def create_user(data: UserCreateDTO) -> UserResponseDTO:
 **원칙**: 에러는 명확한 예외 타입으로 처리하고, HTTP 상태 코드와 매핑한다.
 
 **적용**:
+
 - 도메인별 예외 클래스 정의
 - 예외에 컨텍스트 정보 포함
 - 상위 레이어에서 일관된 에러 처리
 
 **적용 예시**:
+
 ```python
 class ServiceError(Exception):
     """서비스 레이어 기본 예외"""
@@ -339,11 +365,13 @@ class NotFoundError(ServiceError):
 **원칙**: Red-Green-Refactor 사이클을 따르며 테스트를 먼저 작성한다.
 
 **적용**:
+
 - 실패하는 테스트 먼저 작성
 - 최소한의 코드로 통과
 - 리팩토링으로 개선
 
 **적용 예시**:
+
 ```python
 # 1. Red: 실패하는 테스트
 def test_create_user_rejects_duplicate_email():
@@ -367,11 +395,13 @@ def create(data: dict[str, Any]) -> User:
 **원칙**: 불필요한 코드를 제거하고 간결하게 작성한다.
 
 **적용**:
+
 - 중복 코드 제거
 - 의미 없는 주석 제거
 - 자명한 코드는 주석 불필요
 
 **금지 패턴**:
+
 ```python
 # BAD: 불필요한 주석
 def add(x, y):
@@ -390,11 +420,13 @@ def add(x: int, y: int) -> int:
 **원칙**: 공통 로직이 2회 이상 반복되면 함수나 클래스로 추출한다.
 
 **적용**:
+
 - DRY (Don't Repeat Yourself) 원칙
 - 유틸리티 함수로 추출
 - 공통 로직을 모듈화
 
 **적용 예시**:
+
 ```python
 # BAD: 중복 코드
 def process_user(user_id):
@@ -424,11 +456,13 @@ def get_or_raise_not_found[T](repo: Repository[T], entity_id: int) -> T:
 **원칙**: 의존성을 생성자나 메서드 파라미터로 명시적으로 주입한다.
 
 **적용**:
+
 - 하드코딩된 의존성 제거
 - 테스트 용이성 향상
 - 느슨한 결합
 
 **적용 예시**:
+
 ```python
 # BAD: 하드코딩된 의존성
 class UserService:
@@ -448,11 +482,13 @@ class UserService:
 **원칙**: 트랜잭션 경계를 명확히 정의하고, 하나의 유스케이스당 하나의 트랜잭션을 사용한다.
 
 **적용**:
+
 - 서비스 메서드 레벨에서 트랜잭션 관리
 - 중첩 트랜잭션 방지
 - 롤백 안전성 확보
 
 **적용 예시**:
+
 ```python
 from contextlib import contextmanager
 
@@ -480,11 +516,13 @@ def create_order(data: dict[str, Any]) -> Order:
 **원칙**: 로깅은 체계적이고 일관되게 수행하며, 민감한 정보는 로그에 포함하지 않는다.
 
 **적용**:
+
 - INFO: 파이프라인 체크포인트, 완료 상태
 - ERROR: 예외 상세 정보 (상관관계 ID 포함)
 - 민감 정보 제외 (비밀번호, 토큰 등)
 
 **적용 예시**:
+
 ```python
 import logging
 
@@ -508,11 +546,13 @@ def process_order(order_id: int) -> Order:
 **원칙**: 복잡한 로직은 docstring으로 설명하되, 자명한 코드는 주석을 남기지 않는다.
 
 **적용**:
+
 - 공개 API는 docstring 필수
 - 복잡한 비즈니스 로직 설명
 - 타입 힌트로 많은 설명 대체
 
 **적용 예시**:
+
 ```python
 # BAD: 자명한 코드에 주석
 def add(x, y):
@@ -523,14 +563,14 @@ def add(x, y):
 def calculate_discount(price: float, user_tier: UserTier) -> float:
     """
     사용자 등급에 따른 할인율을 계산합니다.
-    
+
     Args:
         price: 원래 가격
         user_tier: 사용자 등급 (BRONZE, SILVER, GOLD, PLATINUM)
-    
+
     Returns:
         할인된 가격
-    
+
     Raises:
         ValueError: 잘못된 사용자 등급인 경우
     """
@@ -550,28 +590,28 @@ def calculate_discount(price: float, user_tier: UserTier) -> float:
 
 ## 원칙 요약표
 
-| 원칙 | 가치 카테고리 | 핵심 내용 |
-|------|-------------|----------|
-| 1. 타입 명시 | Type 기반 강화 | 모든 함수에 타입 힌트 필수 |
-| 2. 동적 코드 금지 | Clean Code | getattr/setattr/hasattr 금지 |
-| 3. isinstance 금지 | Type 기반 강화 | 정확한 타입 시그니처 사용 |
-| 4. 동적 import 금지 | Clean Code | 파일 상단에 import 명시 |
-| 5. 과도한 최적화 금지 | Clean Code | 실제 문제 확인 후 최적화 |
-| 6. 과도한 방어 코드 금지 | Clean Code | 현실적 시나리오에 집중 |
-| 7. 함수 길이 제한 | Clean Code | 최대 25줄, 권장 15줄 |
-| 8. 파일 길이 제한 | Clean Code | 예제 파일 80줄 이하 |
-| 9. 명확한 네이밍 | Clean Code | 목적을 드러내는 이름 |
-| 10. 레이어 분리 | 객체지향 | 적절한 책임 분리 |
-| 11. 단일 책임 | 객체지향 | 하나의 변경 이유만 |
-| 12. 명시적 입출력 | 입출력 명확화 | 타입 힌트와 DTO 사용 |
-| 13. 에러 처리 명확화 | 입출력 명확화 | 명확한 예외 타입 |
-| 14. 테스트 주도 개발 | Clean Code | Red-Green-Refactor |
-| 15. 코드 간결성 | Clean Code | 불필요한 코드 제거 |
-| 16. 재사용성 고려 | 객체지향 | 공통 로직 추출 |
-| 17. 의존성 주입 | 객체지향 | 명시적 의존성 주입 |
-| 18. 트랜잭션 경계 | 입출력 명확화 | 유스케이스당 하나 |
-| 19. 로깅 전략 | 입출력 명확화 | 체계적이고 일관된 로깅 |
-| 20. 문서화 | Clean Code | 복잡한 로직만 설명 |
+| 원칙                     | 가치 카테고리  | 핵심 내용                    |
+| ------------------------ | -------------- | ---------------------------- |
+| 1. 타입 명시             | Type 기반 강화 | 모든 함수에 타입 힌트 필수   |
+| 2. 동적 코드 금지        | Clean Code     | getattr/setattr/hasattr 금지 |
+| 3. isinstance 금지       | Type 기반 강화 | 정확한 타입 시그니처 사용    |
+| 4. 동적 import 금지      | Clean Code     | 파일 상단에 import 명시      |
+| 5. 과도한 최적화 금지    | Clean Code     | 실제 문제 확인 후 최적화     |
+| 6. 과도한 방어 코드 금지 | Clean Code     | 현실적 시나리오에 집중       |
+| 7. 함수 길이 제한        | Clean Code     | 최대 25줄, 권장 15줄         |
+| 8. 파일 길이 제한        | Clean Code     | 예제 파일 80줄 이하          |
+| 9. 명확한 네이밍         | Clean Code     | 목적을 드러내는 이름         |
+| 10. 레이어 분리          | 객체지향       | 적절한 책임 분리             |
+| 11. 단일 책임            | 객체지향       | 하나의 변경 이유만           |
+| 12. 명시적 입출력        | 입출력 명확화  | 타입 힌트와 DTO 사용         |
+| 13. 에러 처리 명확화     | 입출력 명확화  | 명확한 예외 타입             |
+| 14. 테스트 주도 개발     | Clean Code     | Red-Green-Refactor           |
+| 15. 코드 간결성          | Clean Code     | 불필요한 코드 제거           |
+| 16. 재사용성 고려        | 객체지향       | 공통 로직 추출               |
+| 17. 의존성 주입          | 객체지향       | 명시적 의존성 주입           |
+| 18. 트랜잭션 경계        | 입출력 명확화  | 유스케이스당 하나            |
+| 19. 로깅 전략            | 입출력 명확화  | 체계적이고 일관된 로깅       |
+| 20. 문서화               | Clean Code     | 복잡한 로직만 설명           |
 
 ---
 
