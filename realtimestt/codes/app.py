@@ -75,6 +75,10 @@ ffmpeg -i pipe:0 -f s16le -ar 16000 -ac 1 -acodec pcm_s16le pipe:1
 stdin:
 """
 
+from ast import List
+from turtle import st
+
+
 class StreamAuydioConverter:
 
 
@@ -82,4 +86,27 @@ class StreamAuydioConverter:
         self.input_format = input_format
         self.process = None
         self._closed = False
-        
+
+    
+    async def __aenter__(self):
+        """ ffmpeg 프로세스 시작 """
+        cmd: List[st] = [
+            "ffempg", 
+            "-i ", "pip:0",
+            "-f ", "s16le",
+            "-ar", "16000",
+            "-ac", "1",
+            "-acodec", "pcm_s16le",
+            "-loglevel", "error",
+            "pipe:1"
+        ]
+
+        # 비동기 subprocess 생성
+        self.process = await asyncio.create_subprocess_exec(
+            *cmd,
+            stdin=asyncio.subprocess.PIPE,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+
+        return self
