@@ -508,16 +508,75 @@ async def test_with_error_handling():
 client = DagloRealtimeSTTClient(timeout=3600)  # 1시간
 ```
 
-### 연결 재사용
+### gRPC 재연결 시나리오
 
-가능한 경우 연결을 재사용하여 오버헤드를 줄입니다:
+gRPC 연결이 끊기고 재시도할 때는 다음을 수행해야 합니다:
+
+1. **기존 Queue 종료**: 종료 신호 전송
+2. **새 Queue 생성**: 재사용 불가능하므로 새로 생성
+3. **ffmpeg 프로세스 재시작**: 새로운 stdout 파이프 생성
+4. **새 STT 태스크 시작**: 새 Queue와 새 ffmpeg로 시작
 
 ```python
-# 연결 재사용
-async with client:
-    # 여러 스트리밍 세션 수행
-    pass
+# gRPC 재연결 시나리오
+async def handle_grpc_reconnect(self):
+    """gRPC 재연결 처리"""
+    # 1. 기존 STT 태스크 종료
+    if self.stt_processing_task:
+        self.stt_processing_task.cancel()
+        try:
+            await self.stt_processing_task
+        except asyncio.CancelledError:
+            pass
+    
+    # 2. 기존 Queue 종료 (None 전송)
+    await self.message_handler.close_queue()
+    
+    # 3. 새 Queue 생성 (재사용 불가능)
+    self.message_handler.audio_queue = asyncio.Queue()
+    
+    # 4. 새 STT 태스크 시작
+    self.stt_processing_task = asyncio.create_task(
+        self.stt_handler.process_stream(
+            self.message_handler.audio_queue,  # 새 Queue
+            self.session_context.session_id,
+            self.session_context.language_code,
+            self.session_context.interim_results,
+            self.session_context.input_format,
+            send_func,
+            send_error_func,
+            lambda: self.session_context.sequence_number,
+        )
+    )
 ```
+
+**재연결 흐름:**
+
+```
+gRPC 연결 끊김
+    ↓
+기존 STT 태스크 취소
+    ↓
+Queue 종료 신호 전송 (put(None))
+    ↓
+제너레이터 종료
+    ↓
+새 Queue 생성 (asyncio.Queue())
+    ↓
+새 STT 태스크 시작
+    ↓
+새 ffmpeg 프로세스 시작 (새 stdout 파이프)
+    ↓
+새 gRPC 연결 생성
+    ↓
+정상 동작 재개 ✅
+```
+
+**중요 사항:**
+
+- **Queue 재사용 불가능**: 종료된 Queue는 재사용할 수 없으므로 반드시 새로 생성
+- **ffmpeg 재시작 필요**: 새로운 stdout 파이프를 위해 프로세스 재시작
+- **SessionContext 유지**: 재시작 시에도 SessionContext는 유지하여 상태 보존
 
 ### 메타데이터 최적화
 
@@ -530,6 +589,92 @@ metadata = (
 )
 ```
 
+## 스트림 종료 시나리오
+
+### 제너레이터 종료 보장
+
+STT 스트림 처리는 여러 단계의 제너레이터로 구성됩니다:
+
+```
+AudioHandler.generate_chunks() → 오디오 변환 → gRPC 스트림
+```
+
+각 제너레이터는 `None` 종료 신호를 받아 안전하게 종료됩니다:
+
+```python
+# AudioHandler.generate_chunks()
+async def generate_chunks(
+    self, audio_queue: asyncio.Queue[bytes]
+) -> AsyncIterator[bytes]:
+    while True:
+        chunk = await audio_queue.get()
+        
+        # None이면 종료 신호 (제너레이터 종료 보장)
+        if chunk is None:
+            break  # 안전하게 종료
+        
+        yield chunk
+```
+
+### 종료 신호 전파
+
+종료 신호는 다음 순서로 전파됩니다:
+
+```
+1. close_queue() 호출
+   ↓
+2. audio_queue.put(None) (종료 신호)
+   ↓
+3. AudioHandler.generate_chunks()에서 None 수신
+   ↓
+4. break로 제너레이터 종료
+   ↓
+5. 오디오 변환 제너레이터 종료
+   ↓
+6. gRPC 스트림 종료
+   ↓
+7. STT 태스크 완료
+```
+
+### 예외 상황에서의 종료 보장
+
+예외가 발생해도 제너레이터는 안전하게 종료됩니다:
+
+```python
+async def generate_chunks(
+    self, audio_queue: asyncio.Queue[bytes]
+) -> AsyncIterator[bytes]:
+    chunk_count = 0
+    
+    while True:
+        try:
+            chunk = await asyncio.wait_for(
+                audio_queue.get(),
+                timeout=1.0,
+            )
+            
+            if chunk is None:
+                break  # 정상 종료
+            
+            chunk_count += 1
+            yield chunk
+            
+        except asyncio.TimeoutError:
+            continue  # 타임아웃 시 계속 대기
+        except Exception as e:
+            logger.error(
+                f"오디오 청크 생성 중 오류: chunk_count={chunk_count}, error={str(e)}",
+                exc_info=True,
+            )
+            break  # 예외 발생 시에도 종료 보장
+```
+
+**종료 보장 메커니즘:**
+
+- **정상 종료**: `None` 수신 시 `break`로 종료
+- **예외 종료**: 예외 발생 시에도 `break`로 종료
+- **타임아웃**: 타임아웃은 예외가 아니므로 계속 대기
+
 ## 정리
 
 이 장에서는 다음을 학습했습니다:
@@ -538,6 +683,8 @@ metadata = (
 2. **Protocol Buffer**: 효율적인 바이너리 직렬화
 3. **양방향 스트리밍**: 클라이언트와 서버가 동시에 데이터 전송
 4. **gRPC 클라이언트 구현**: 연결, 스트리밍, 종료
+5. **제너레이터 종료 보장**: None 종료 신호를 통한 안전한 종료
+6. **gRPC 재연결**: Queue 재생성 및 ffmpeg 재시작
 
 다음 장인 [05-STT-결과-처리-및-전송.md](./05-STT-결과-처리-및-전송.md)에서는 STT 결과를 처리하고 전송하는 방법을 학습합니다.
 
