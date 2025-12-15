@@ -19,7 +19,7 @@ gRPC는 Protocol Buffers(protobuf)를 사용하여 서비스와 메시지를 정
 ### Client streaming
 클라이언트 스트리밍. 클라이언트가 여러 개의 요청을 스트림으로 보내고 서버가 하나의 응답을 반환합니다.
 
-### Bidirecttional Streaming
+### Bidirectional Streaming
 양방향 스트리밍. 클라이언트와 서버가 독립적으로 여러 메시지를 주고받을 수 있습니다.
 
 ### 멀티 플렉싱
@@ -35,7 +35,7 @@ gRPC 개발 도구 모음입니다. protoc 컴파일러와 Python 플러그인�
 
 ## gRPC 구성 요소
 
-### stub?
+### stub
 gRPC 클라이언트에서 서버의 메서드를 호출하기 위한 프록시 객체입니다. 서버의 서비스 정의에 따라 자동 생성됩니다.
 
 ### channel

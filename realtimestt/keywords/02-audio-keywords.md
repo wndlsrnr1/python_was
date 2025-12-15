@@ -55,7 +55,7 @@ PyAudio 라이브러리를 설치하는 pip 명령어입니다. 오디오 입출
 오디오 코덱을 지정하는 옵션입니다. `-acodec pcm_s16le`는 PCM signed 16-bit little-endian 코덱을 사용합니다.
 
 ### -i pip 0
-입력 옵션의 오타로 보입니다. 정확한 형태는 `-i input.wav` 또는 파이프 입력을 사용할 경우 `-i pipe:0`입니다.
+입력 옵션의 오타로 보입니다. 정확한 형태는 `-i input.wav` 또는 표준 입력(stdin)을 사용할 경우 `-i pipe:0`입니다. `pipe:0`은 표준 입력을 의미합니다.
 
 ### -f s16le
 signed 16-bit little-endian 포맷으로 출력합니다. STT 서비스에서 요구하는 일반적인 오디오 포맷입니다.
@@ -67,7 +67,7 @@ signed 16-bit little-endian 포맷으로 출력합니다. STT 서비스에서 �
 모노(단일 채널) 오디오로 변환합니다.
 
 ### -acodec pcm -s16le
-PCM signed 16-bit little-endian 코덱을 사용합니다. 정확한 형태는 `-acodec pcm_s16le`입니다.
+PCM signed 16-bit little-endian 코덱을 사용합니다. 정확한 형태는 `-acodec pcm_s16le`입니다. 공백 없이 언더스코어로 연결해야 합니다.
 
 ### pipe:1
 표준 출력(stdout)으로 데이터를 전송합니다. FFmpeg에서 파이프를 통해 데이터를 전달할 때 사용합니다.
