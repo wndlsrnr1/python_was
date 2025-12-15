@@ -68,6 +68,7 @@ pip install gevent
 gunicorn app:application --worker-class gevent --workers 4
 ```
 
+<<<<<<< HEAD
 #### 비동기 I/O란?
 
 **동기 I/O (Synchronous I/O)**와 **비동기 I/O (Asynchronous I/O)**의 차이를 이해하는 것이 중요합니다.
@@ -143,6 +144,8 @@ gevent는 각 요청을 코루틴으로 처리합니다. 하나의 워커 프로
 
 이를 통해 **프로세스 수는 적게 유지하면서도 높은 동시성**을 달성할 수 있습니다.
 
+=======
+>>>>>>> 0dce80b (정리함)
 ### gthread
 
 - **특징**: 스레드 기반
@@ -156,12 +159,21 @@ gunicorn app:application --worker-class gthread --threads 4 --workers 2
 
 ### Spring/Tomcat과의 비교
 
+<<<<<<< HEAD
 | Spring/Tomcat           | Gunicorn                               |
 | ----------------------- | -------------------------------------- |
 | 스레드 풀 (Thread Pool) | 워커 프로세스 풀 (Worker Process Pool) |
 | `maxThreads` 설정       | `--workers` 설정                       |
 | 스레드당 하나의 요청    | 프로세스당 하나의 요청 (sync)          |
 | 공유 메모리             | 프로세스 간 메모리 분리                |
+=======
+| Spring/Tomcat | Gunicorn |
+|--------------|----------|
+| 스레드 풀 (Thread Pool) | 워커 프로세스 풀 (Worker Process Pool) |
+| `maxThreads` 설정 | `--workers` 설정 |
+| 스레드당 하나의 요청 | 프로세스당 하나의 요청 (sync) |
+| 공유 메모리 | 프로세스 간 메모리 분리 |
+>>>>>>> 0dce80b (정리함)
 
 **핵심 차이**: Tomcat은 스레드를 사용하고, Gunicorn은 프로세스를 사용합니다. 프로세스는 메모리를 공유하지 않으므로 더 안정적이지만, 메모리 사용량이 더 큽니다.
 
@@ -188,11 +200,19 @@ def application(environ, start_response):
     status = '200 OK'
     headers = [('Content-Type', 'text/plain; charset=utf-8')]
     start_response(status, headers)
+<<<<<<< HEAD
 
     # 프로세스 ID와 작업 시뮬레이션
     pid = os.getpid()
     time.sleep(1)  # 1초 대기 (동시성 테스트용)
 
+=======
+    
+    # 프로세스 ID와 작업 시뮬레이션
+    pid = os.getpid()
+    time.sleep(1)  # 1초 대기 (동시성 테스트용)
+    
+>>>>>>> 0dce80b (정리함)
     return [f'Worker PID: {pid}\n'.encode('utf-8')]
 ```
 
@@ -230,3 +250,7 @@ curl http://127.0.0.1:8000
 ---
 
 **이전: [03_basic_setup.md](03_basic_setup.md) | 다음: [05_django.md](05_django.md) →**
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0dce80b (정리함)

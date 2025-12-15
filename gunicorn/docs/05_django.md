@@ -66,6 +66,7 @@ gunicorn myproject.wsgi:application \
 - `--access-logfile -`: 접근 로그를 표준 출력으로
 - `--error-logfile -`: 에러 로그를 표준 출력으로
 
+<<<<<<< HEAD
 ### Timeout 설정 상세 설명
 
 #### Timeout이란?
@@ -272,6 +273,8 @@ gunicorn myproject.wsgi:application \
 
 이 설정은 로그 파일을 매일 회전시키고, 14일치를 보관하며, 압축합니다.
 
+=======
+>>>>>>> 0dce80b (정리함)
 ## 5.3 Django 설정 주의사항
 
 ### ALLOWED_HOSTS
@@ -297,6 +300,7 @@ Gunicorn은 정적 파일을 직접 서빙하지 않습니다. 다음 중 하나
 1. **Nginx/Apache**: 리버스 프록시로 정적 파일 서빙
 2. **WhiteNoise**: Django 미들웨어로 정적 파일 서빙
 
+<<<<<<< HEAD
 #### Gunicorn이 정적 파일을 서빙하지 않는 이유
 
 **Gunicorn의 역할**:
@@ -362,10 +366,13 @@ WhiteNoiseMiddleware
 
 **1. 설치**:
 
+=======
+>>>>>>> 0dce80b (정리함)
 ```bash
 pip install whitenoise
 ```
 
+<<<<<<< HEAD
 **2. settings.py 설정**:
 
 ```python
@@ -391,10 +398,25 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 **3. 정적 파일 수집**:
 
+=======
+`settings.py`:
+
+```python
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # 추가
+    # ...
+]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+```
+
+>>>>>>> 0dce80b (정리함)
 ```bash
 python manage.py collectstatic
 ```
 
+<<<<<<< HEAD
 이 명령어는:
 
 - `STATICFILES_DIRS`에 있는 정적 파일들을 수집
@@ -467,12 +489,17 @@ server {
 
 이 경우 `settings.py`에서 WhiteNoise 미들웨어를 제거하거나, Nginx가 정적 파일을 먼저 처리하므로 WhiteNoise는 동작하지 않습니다.
 
+=======
+>>>>>>> 0dce80b (정리함)
 ## 5.4 Spring Boot와의 비교
 
 ### 배포 방식
 
 **Spring Boot**:
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0dce80b (정리함)
 ```bash
 # 빌드
 mvn clean package
@@ -482,7 +509,10 @@ java -jar target/myapp.jar
 ```
 
 **Django + Gunicorn**:
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0dce80b (정리함)
 ```bash
 # 의존성 설치
 pip install -r requirements.txt
@@ -492,7 +522,10 @@ gunicorn myproject.wsgi:application
 ```
 
 **차이점**:
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0dce80b (정리함)
 - Spring Boot: JAR 파일로 패키징하여 실행
 - Django: 소스코드를 직접 실행
 
@@ -533,3 +566,7 @@ gunicorn myproject.wsgi:application --bind 0.0.0.0:8000
 ---
 
 **이전: [04_worker_model.md](04_worker_model.md) | 다음: [06_fastapi.md](06_fastapi.md) →**
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0dce80b (정리함)
